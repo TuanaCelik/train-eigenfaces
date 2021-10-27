@@ -10,6 +10,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from PIL import Image
 
 
 def train():
@@ -23,6 +24,7 @@ def train():
 
     # introspect the images arrays to find the shapes (for plotting)
     n_samples, h, w = lfw_people.images.shape
+    print("Samples: " + str(n_samples) + " H: " + str(h) + " W " + str(w))
 
     # for machine learning we use the 2 data directly (as relative pixel
     # positions info is ignored by this model)
@@ -46,6 +48,8 @@ def train():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=42
     )
+  
+    print("Shape: " + str(X_test.shape))
 
     # #############################################################################
     # Compute a PCA (eigenfaces) on the face dataset (treated as unlabeled
@@ -78,12 +82,13 @@ def train():
         "C": [1e3, 5e3, 1e4, 5e4, 1e5],
         "gamma": [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
     }
-    clf = GridSearchCV(SVC(kernel="rbf", class_weight="balanced"), param_grid)
+    clf = GridSearchCV(SVC(kernel="rbf", class_weight="balanced", probability=True), param_grid)
     clf = clf.fit(X_train_pca, y_train)
     print("done in %0.3fs" % (time() - t0))
     print("Best estimator found by grid search:")
     print(clf.best_estimator_)
     pickle.dump(clf, open('./model/eigenfaces-sklearn-lfw.joblib', 'wb+'))
+    pickle.dump(pca, open('./model/eigenfaces-pca.pkl', 'wb+'))
     print("Saved the model...")
 
     # #############################################################################

@@ -1,5 +1,6 @@
 *.joblib
 *.pyc
+*.pkl
 
 # Packages
 *.egg
